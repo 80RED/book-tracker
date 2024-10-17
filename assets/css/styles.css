@@ -1,8 +1,4 @@
-* {
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-}
+
 
 body {
     font-family: Arial, sans-serif;
@@ -22,6 +18,12 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 50%;
     margin: 0 auto;
+}
+
+#apiSearch {
+    width: 40%;
+    max-width: 800px; /* Increased max-width */
+    padding: 10px;
+    font-size: 14px;
 }

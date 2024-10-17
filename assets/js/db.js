@@ -21,10 +21,6 @@ request.onupgradeneeded = (event) => {
         bookStore.createIndex("ISBN_13", "ISBN_13", {unique: true});
         bookStore.createIndex("status", "status", {unique: false});
     }
-
-    if (!db.objectStoreNames.contains("activities")) {
-        db.createObjectStore("activities", { autoIncrement: true });
-    }
 };
 
 request.onsuccess = (event) => {

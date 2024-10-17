@@ -4,27 +4,32 @@
         <meta charset="UTF-8"/>
         <title>80 reads</title>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="assets/css/styles.css">
+        <link rel="stylesheet" href="/static/css/styles.css">
+        <script>
+            /*to prevent Firefox FOUC, this must be here*/
+            let FF_FOUC_FIX;
+        </script>
     </head>
     
     <body>
-        <nav>
-            <ul class="navbar"> 
-                <li>80Reads</li>
-                <li>Import</li>
-                <li>Export</li>
-            </ul>
+        <nav class="navbar">
+            <p class="nav-logo">80Reads</p>
+            <a href="#about" class="nav-link">About</a>
         </nav>
 
-
-
-
-
-        <div>
+        <div class="heading">
             <h1>Books</h1>
-            <p><strong>Search</strong></p>
-            <input type="Text" placeholder="Search book">
+            
+            <input id="apiSearch" type="Text" placeholder="Add book">
         </div>  
+
+
+
+
+
+
+
+
+
     </body>
 </html>

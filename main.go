@@ -3,24 +3,30 @@ package main
 import (
 	"log"
 	"net/http"
-	"path/filepath"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/" {
-		http.ServeFile(w, r, `index.html`)
-		return
-	}
+func staticFileHandler() http.Handler {
+	fs := http.FileServer(http.Dir("assets"))
+	return http.StripPrefix("/static/", fs)
+}
 
-	if filepath.Ext(r.URL.Path) != "" {
-		http.ServeFile(w, r, "assets"+r.URL.Path)
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
+	} else {
+		http.ServeFile(w, r, "index.html")
 	}
-
-	http.NotFound(w, r)
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+
+	// Set up file server for static assets
+	http.Handle("/static/", staticFileHandler())
+
+	// Handler for the root path
+	http.HandleFunc("/", rootHandler)
+
+	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

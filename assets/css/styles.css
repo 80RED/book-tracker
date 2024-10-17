@@ -1,3 +1,27 @@
+* {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+}
+
 body {
-    background-color: black;
+    font-family: Arial, sans-serif;
+    background-color: #dad7cd;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    padding: 10px 20px;
+    background-color: #a3b18a; 
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    margin: 0 auto;
 }

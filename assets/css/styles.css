@@ -1,14 +1,24 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #dad7cd;
+    background-color: rgb(249 250 251);
+    margin: 0;
 }
 
 .navbar {
+    background-color: white;
+    border-bottom: solid;
+    border-color: #e5e7eb;
+    border-width: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.navlinks {
+    width: 80rem;
     display: flex;
     justify-content: space-between;
     align-items: center; 
-    padding: 10px 20px;
-    background-color: #a3b18a; 
+    padding: 0.5rem 20px;
 }
 
 .heading {

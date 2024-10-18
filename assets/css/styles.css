@@ -13,7 +13,7 @@ body {
     justify-content: center;
 }
 
-.navlinks {
+.navItems {
     width: 80rem;
     display: flex;
     justify-content: space-between;

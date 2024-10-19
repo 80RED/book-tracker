@@ -1,3 +1,4 @@
+// Creating / opening Indexeddb
 
 let db;
 
@@ -26,3 +27,19 @@ request.onupgradeneeded = (event) => {
 request.onsuccess = (event) => {
     db = event.target.result;
 };
+
+
+// Starting API call / Search results 
+
+// Manage user API key
+
+// Debounce API calls
+
+function debounce(func, delay) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, delay);
+    };
+}
+

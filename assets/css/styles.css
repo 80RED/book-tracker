@@ -6,19 +6,36 @@ body {
 
 .navbar {
     background-color: white;
-    border-bottom: solid;
-    border-color: #e5e7eb;
-    border-width: 1;
+    border-bottom: 1px solid #e5e7eb;
     display: flex;
     justify-content: center;
+    color: rgb(107 114 128);
+    padding: 16px 0;
 }
 
-.navItems {
-    width: 80rem;
+.navSides {
+    width: 100%;
+    max-width: 80rem;
     display: flex;
     justify-content: space-between;
     align-items: center; 
     padding: 0.5rem 20px;
+}
+
+.navLinks {
+    display: flex;
+    align-items: center; 
+    gap: 1.25rem;
+    
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: rgb(107, 114, 128);
+}
+
+a:hover {
+    color: #007bff;           
 }
 
 .heading {
@@ -26,12 +43,18 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 0 auto;
+    margin: auto;
 }
 
 #apiSearch {
     width: 25%;
-    max-width: 800px; /* Increased max-width */
-    padding: 5px;
-    font-size: 14px;
+    max-width: 800px; 
+    padding: 0.3rem;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    #apiSearch {
+        width: 80%; 
+    }
 }

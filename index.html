@@ -4,24 +4,23 @@
         <meta charset="UTF-8"/>
         <title>80 reads</title>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href="/static/css/styles.css">
-        <script>
-            /*to prevent Firefox FOUC, this must be here*/
-            let FF_FOUC_FIX;
-        </script>
+        <link rel="stylesheet" href="static/css/styles.css">
+        
     </head>
     
     <body>
         <nav class="navbar">
-            <div class="navItems">
-                <p class="nav-logo">80Reads</p>
-                <a href="#about" class="nav-link">About</a>
+            <div class="navSides">
+                <a href="index.html" class="nav-logo, link">80Reads</a>
+                <div class="navLinks">
+                    <a href="#about" class="link">About</a>
+                    <a href="#settings" class="link">Settings</a>
+                </div>
             </div>  
         </nav>
 
         <div class="heading">
             <h1>Books</h1>
-            
             <input id="apiSearch" type="Text" placeholder="Add book">
         </div>  
 

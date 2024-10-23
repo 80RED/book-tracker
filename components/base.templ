@@ -1,0 +1,31 @@
+package components
+
+templ Base(children templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<title>80 reads</title>
+			<meta name="viewport" content="width=device-width,initial-scale=1"/>
+			<link rel="stylesheet" href="/assets/css/styles.css"/>
+			<script src="/assets/js/htmx.min.js"></script>
+			<script src="/assets/js/db.js"></script>
+			<link rel="icon" type="image/x-icon" href="/assets/book-favicon.svg"/>
+		</head>
+		<body>
+			<nav class="navbar">
+				<div class="navSides" hx-boost="true" hx-swap="innerHTML" hx-target="#content" >
+					<a href="/books" class="nav-logo link">80Reads</a>
+					<div class="navLinks">
+						<a href="/books">Books</a>
+						<a href="/about">About</a>
+						<a href="/settings">Settings</a>
+					</div>
+				</div>
+			</nav>
+			<main id="content">
+				@children
+			</main>
+		</body>
+	</html>
+}

@@ -1,48 +1,37 @@
+
 body {
     font-family: Arial, sans-serif;
-    background-color: rgb(249 250 251);
-    margin: 0;
+    background-color: #f9fafb;
 }
 
-.navbar {
+nav {
     background-color: white;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: center;
-    color: rgb(107 114 128);
-    padding: 16px 0;
-}
-
-.navSides {
-    width: 100%;
-    max-width: 80rem;
     display: flex;
     justify-content: space-between;
-    align-items: center; 
-    padding: 0.5rem 20px;
+    width: clamp(320px, 90%, 80rem);
+    margin: 0 auto;
+    padding: 1rem;
+    box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px,
+                rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
 }
 
 .navLinks {
     display: flex;
-    align-items: center; 
     gap: 1.25rem;
-    
 }
 
 a, a:visited {
     text-decoration: none;
-    color: rgb(107, 114, 128);
+    color: #6b7280;
 }
 
 a:hover {
     color: #007bff;           
 }
 
-/* Dropdown */
+/* Components */
 
-
-/* Books component */
-.heading {
+.templateHeading {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -50,14 +39,14 @@ a:hover {
     margin: auto;
 }
 
-#apiSearch {
+.apiSearchBar {
     width: 25%;
     padding: 0.3rem;
     font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
-    #apiSearch {
+    .apiSearchBar {
         width: 80%; 
     }
 }

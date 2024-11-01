@@ -22,16 +22,47 @@ request.onupgradeneeded = (event) => {
         bookStore.createIndex("ISBN_13", "ISBN_13", {unique: true});
         bookStore.createIndex("status", "status", {unique: false});
     }
+
+    if (!db.objectStoreNames.contains("settings")) {
+        db.createObjectStore("settings")
+    }
 };
 
 request.onsuccess = (event) => {
     db = event.target.result;
+    loadSavedApiKey();
 };
 
 
-// Starting API call / Search results 
+// API Key Management 
 
-// Manage user API key
+function loadSavedApiKey() {
+    const transaction = db.transaction(['settings'], 'readonly');
+    const store = transaction.objectStore('settings');
+    const request = store.get('apiKey');
+
+    request.onsuccess = () => {
+        if (request.result) {
+            document.getElementById('apiKey').value = request.result;
+        }
+    };
+}
+
+    // saveApiKey(event)
+    // TODO
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('apiKey');
+    const currentType = input.type;
+
+    input.type = currentType === 'password' ? 'text' : 'password';
+}
+
+    // testApiKey() 
+    // TODO
+
+    // updateApiStatus(message, type) 
+    // TODO
 
 // Debounce API calls
 

@@ -29,7 +29,7 @@ func Settings() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"templateHeading\"><h1>settings</h1></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"template\"><h1>Settings</h1><div class=\"settings\"><div class=\"settings-content\"><h3>Google Books API Key</h3><p>Enter your API key to enable search function</p><form class=\"api-key-form\" hx-on:submit=\"saveApiKey(event)\"><div class=\"input-group\"><input type=\"password\" id=\"apiKey\" name=\"apiKey\" class=\"api-Key-input\" placeholder=\"Enter your API key\" autocomplete=\"off\"> <button type=\"button\" class=\"visibility-toggle\" onclick=\"toggleApiKeyVisibility()\">Toggle Visibility</button></div><div class=\"button-group\"><button type=\"submit\">Save Key</button> <button type=\"button\" onclick=\"testApiKey()\">Test Key</button></div></form><div class=\"api-status\"></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

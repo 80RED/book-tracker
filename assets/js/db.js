@@ -236,8 +236,10 @@ document.addEventListener('click', function(event) {
     const searchBar = document.querySelector('.apiSearchBar');
     const searchResults = document.getElementById('search-results');
     
-    if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
-        searchResults.classList.remove('active');
+    if (searchBar && searchResults) {
+        if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+            searchResults.classList.remove('active');
+        }
     }
 });
 

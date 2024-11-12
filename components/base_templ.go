@@ -29,7 +29,7 @@ func Base(children templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>80 reads</title><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"stylesheet\" href=\"/assets/css/styles.css\"><link rel=\"icon\" type=\"image/x-icon\" href=\"/assets/imgs/book-favicon.svg\"><script defer src=\"/assets/js/db.js\"></script><script defer src=\"/assets/js/htmx.min.js\"></script></head><body><nav hx-boost=\"true\" hx-swap=\"innerHTML\" hx-target=\"#content\"><a href=\"/\">80Reads</a><div class=\"navLinks\"><a href=\"/books\">Books</a> <a href=\"/about\">About</a> <a href=\"/settings\">Settings</a></div></nav><main id=\"content\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>80 reads</title><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"stylesheet\" href=\"/assets/css/styles.css\"><link rel=\"icon\" type=\"image/x-icon\" href=\"/assets/imgs/book-favicon.svg\"><script defer src=\"/assets/js/db.js\"></script><script defer src=\"/assets/js/htmx.min.js\"></script></head><body><nav hx-boost=\"true\" hx-swap=\"innerHTML\" hx-target=\"#content\"><a href=\"/\">80Reads</a><div class=\"navLinks\"><a href=\"/books\">Books</a> <a href=\"/\">Import</a> <a href=\"/\">Export</a> <a href=\"/settings\">API Key</a></div></nav><main id=\"content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

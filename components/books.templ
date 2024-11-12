@@ -3,6 +3,16 @@ package components
 templ Books() {
 	<div class="template">
 		<h1>Books</h1>
-		<input class="apiSearchBar" type="Text" placeholder="Add book" name="query"/>
+		<input 
+			class="apiSearchBar" 
+			type="Text" 
+			placeholder="Search books..." 
+			name="query"
+			oninput="debounceSearch(this.value)"
+			autocomplete="off"/>
+	</div>
+
+	<div id="search-results" class="search-results">
+	
 	</div>
 }

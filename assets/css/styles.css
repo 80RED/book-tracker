@@ -95,7 +95,7 @@ button {
 .api-status {
     margin-top: 1rem;
     padding: 0.75rem;
-    border-radius: 4px;
+    border-radius: 1px;
     font-size: 0.875rem;
     display: none;  
 }
@@ -134,19 +134,49 @@ button {
     box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
 }
 .search-results {
+    position: absolute;
     width: 35%;
     margin-left: auto;
     margin-right: auto;
     margin-top: -0.5rem;
     background: white;
     z-index: 1000;
-    display: none; 
+    display: none;
+    transform: translateX(-50%);
+    left: 50%;
+}
+
+.search-results.expanded {
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .search-results.active:not(:empty) {
     display: block;
     box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px,
                 rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+}
+
+.search-results {
+    scroll-behavior: smooth;
+}
+
+.search-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 1px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
 }
 
 .search-results.active {
@@ -173,13 +203,18 @@ button {
     display: grid;
     grid-template-columns: 40px 1fr auto;
     gap: 0.75rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     align-items: center;
     cursor: default;
 }
 
 .book-card:hover {
     background-color: #f8f9fa;
+}
+
+.book-card:last-of-type {
+    margin-bottom: 0;
+    border-bottom: none;
 }
 
 /* Book cover styling */
@@ -189,7 +224,7 @@ button {
     height: 60px;
     overflow: hidden;
     background: #f5f5f5;
-    border-radius: 2px;
+    border-radius: 1px;
     border: 1px solid #eee;
 }
 
@@ -234,14 +269,14 @@ button {
     text-overflow: ellipsis;
 }
 
-/* Add button styling */
+/* Choose button styling */
 
-.add-book-btn {
+.choose-book-btn {
     padding: 0.25rem 0.75rem;
     background-color: transparent;
     color: #1a73e8;
     border: 1px solid #1a73e8;
-    border-radius: 3px;
+    border-radius: 1px;
     cursor: pointer;
     font-size: 0.75rem;
     white-space: nowrap;
@@ -252,6 +287,7 @@ button {
 }
 
 /* Messages styling */
+
 .error-message, .no-results {
     padding: 0.75rem 1rem;
     color: #70757a;
@@ -276,7 +312,16 @@ button {
     color: #1a73e8;
     font-size: 0.875rem;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin: 0; 
+    bottom: 0;
+    left: 0;
+}
+
+/* Ensure expanded state maintains scrolling */
+
+.search-results.expanded {
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .load-more-btn:hover {
@@ -286,3 +331,376 @@ button {
 .load-more-btn:active {
     background-color: #f1f3f4;
 }
+
+/* Modal Overlay */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;  
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;  
+}
+
+/* Modal Content */
+
+.book-modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    margin: 2rem;
+}
+
+/* Modal Header */
+
+.book-modal {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1px;
+    width: 85%;
+    max-width: 500px; 
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Modal Base */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.book-modal {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1px;
+    width: 85%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Header */
+
+.book-modal-header {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.book-modal-cover {
+    width: 100px;
+    height: 150px;
+    flex-shrink: 0;
+    background: #f5f5f5;
+    border: 1px solid #eee;
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+.book-modal-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-modal-title {
+    flex-grow: 1;
+    min-width: 0; 
+}
+
+.book-modal-title h2 {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem 0;
+    color: #1a1a1a;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+}
+
+.book-modal-title .authors {
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+/* Book Info Grid */
+
+.book-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 1px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.info-value {
+    font-size: 0.875rem;
+    color: #374151;
+    word-break: break-word;
+}
+
+/* Book Description */
+
+.book-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Modal Actions */
+
+.book-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Status Select */
+
+.status-select {
+    flex: 1;
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 1px;
+    font-size: 0.875rem;
+    background-color: white;
+    background-image: url('/assets/imgs/select-arrow.svg');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+}
+
+.status-select::after {
+    content: "▾";
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+}
+
+/* Status Options */
+
+.status-select option[value="to-read"] {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-select option[value="in-progress"] {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-select option[value="completed"] {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+/* Modal Buttons */
+
+.modal-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 1px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.modal-btn.cancel {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.modal-btn.cancel:hover {
+    background-color: #e5e7eb;
+}
+
+.modal-btn.add {
+    background-color: #2563eb;
+    border: 1px solid transparent;
+    color: white;
+}
+
+.modal-btn.add:hover {
+    background-color: #1d4ed8;
+}
+
+/* Scrollbar */
+
+.book-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.book-modal::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 1px;
+}
+
+.book-modal::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1px;
+}
+
+.book-modal::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Responsive Adjustments */
+
+@media (max-width: 640px) {
+    .book-modal {
+        width: 95%;
+        padding: 1rem;
+    }
+
+    .book-modal-header {
+        gap: 1rem;
+    }
+
+    .book-modal-cover {
+        width: 80px;
+        height: 120px;
+    }
+
+    .book-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .book-modal-actions {
+        flex-direction: column;
+    }
+
+    .status-select {
+        width: 100%;
+    }
+}
+
+/* Notification */
+
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    min-width: 250px;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 1px;
+    color: white;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease-in-out;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    background-color: #4caf50;
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+.toast.error {
+    background-color: #f44336;
+    box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+}
+
+.toast.info {
+    background-color: #2196f3;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0 5px;
+    margin-left: 10px;
+}
+
+.toast-close:hover {
+    opacity: 0.8;
+}
+
+/* Library */
+
+.library-container {
+    width: clamp(320px, 90%, 80rem);
+    margin: 0 auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 1px;
+    min-height: 200px;
+    background: white;
+    position: relative;
+    z-index: 1;
+    margin-top: 2rem;
+}
+

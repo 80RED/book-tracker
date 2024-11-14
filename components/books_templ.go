@@ -29,7 +29,7 @@ func Books() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"template\"><h1>Books</h1><input class=\"apiSearchBar\" type=\"Text\" placeholder=\"Search books...\" name=\"query\" oninput=\"debounceSearch(this.value)\" autocomplete=\"off\"></div><div id=\"search-results\" class=\"search-results\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"template\"><h1>Books</h1><input class=\"apiSearchBar\" type=\"Text\" placeholder=\"Search books...\" name=\"query\" oninput=\"debounceSearch(this.value)\" autocomplete=\"off\"></div><div id=\"search-results\" class=\"search-results\"></div><div class=\"library-container\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

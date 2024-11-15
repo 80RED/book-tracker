@@ -50,6 +50,9 @@ func assetHandler() http.Handler {
 
 func booksHandler(w http.ResponseWriter, r *http.Request) {
 	content := components.Books()
+
+	w.Header().Set("HX-Trigger", "initializeBooks")
+
 	renderContent(w, r, content)
 }
 

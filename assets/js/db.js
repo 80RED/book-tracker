@@ -5,6 +5,26 @@ let currentLibraryBook = null;
 
 const request = window.indexedDB.open("db", 7);
 
+document.addEventListener('htmx:afterSwap', function(evt) {
+    console.log('HTMX afterSwap triggered, pathname:', window.location.pathname); // Debug log
+    
+    if (window.location.pathname === "/books" || window.location.pathname === "/") {
+        try {
+            console.log('On books page, initializing components...'); // Debug log
+            injectBookModal();
+            injectToastContainer();
+            injectLibraryComponents();
+        } catch (error) {
+            console.error('Error initializing library components:', error);
+        }
+    }
+});
+
+request.onerror = (event) => {
+    console.error("Error opening IndexedDB:", event.target.error);
+};
+
+
 request.onerror = (event) => {
     console.error("Error opening IndexedDB:", event.target.error);
 };
@@ -511,64 +531,81 @@ async function getApiKey() {
     })
 }
 
+// Update the injectLibraryComponents function
 function injectLibraryComponents() {
+    console.log('Injecting library components...'); // Debug log
     const libraryContainer = document.querySelector('.library-container');
     
-    if (libraryContainer && !libraryContainer.querySelector('.library-search')) {
+    if (!libraryContainer) {
+        console.error('Library container not found');
+        return;
+    }
+    
+    // Only inject the search input if it doesn't already exist
+    if (!libraryContainer.querySelector('.library-search')) {
+        console.log('Injecting search input...'); // Debug log
         const searchInput = document.createElement('input');
         searchInput.className = 'library-search';
         searchInput.type = 'text';
         searchInput.placeholder = 'Search by title, author, category or status...';
         searchInput.oninput = (e) => filterLibrary(e.target.value);
-
-        // Insert the search input at the very beginning of .library-container
         libraryContainer.insertAdjacentElement('afterbegin', searchInput);
     }
 
-    const modalHTML = `
-        <div class="library-modal" id="libraryModal">
-            <div class="library-modal-content">
-                <div class="modal-header">
-                    <h2 id="modal-title"></h2>
-                    <button class="close-modal" onclick="closeLibraryModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="book-details">
-                        <div class="book-cover" id="modal-cover"></div>
-                        <div class="book-info">
-                            <p id="modal-authors"></p>
-                            <p id="modal-categories"></p>
-                            <p id="modal-pages"></p>
-                            <div class="status-control">
-                                <label for="modal-status">Status:</label>
-                                <select id="modal-status">
-                                    <option value="to-read">To Read</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="completed">Completed</option>
-                                </select>
+    // Only inject the modal if it doesn't already exist
+    if (!document.getElementById('libraryModal')) {
+        console.log('Injecting library modal...'); // Debug log
+        const modalHTML = `
+            <div class="library-modal" id="libraryModal">
+                <div class="library-modal-content">
+                    <div class="modal-header">
+                        <h2 id="modal-title"></h2>
+                        <button class="close-modal" onclick="closeLibraryModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="book-details">
+                            <div class="book-cover" id="modal-cover"></div>
+                            <div class="book-info">
+                                <p id="modal-authors"></p>
+                                <p id="modal-categories"></p>
+                                <p id="modal-pages"></p>
+                                <div class="status-control">
+                                    <label for="modal-status">Status:</label>
+                                    <select id="modal-status">
+                                        <option value="to-read">To Read</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="book-description" id="modal-description"></div>
-                    <div class="modal-actions">
-                        <button class="modal-btn delete">Delete Book</button>    
-                        <button class="modal-btn update" onclick="updateBookStatus()">Update</button>                       
+                        <div class="book-description" id="modal-description"></div>
+                        <div class="modal-actions">
+                            <button class="modal-btn delete">Delete Book</button>    
+                            <button class="modal-btn update" onclick="updateBookStatus()">Update</button>                       
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
-
-    
-    if (!document.getElementById('libraryModal')) {
+        `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
+
+    console.log('Loading library...'); // Debug log
     loadLibrary();
 }
 
 function loadLibrary() {
+    console.log('loadLibrary called'); // Debug log
     const request = indexedDB.open("db", 7);
+    
+    request.onerror = (event) => {
+        console.error('Error opening database:', event.target.error);
+        showToast('Error loading library', 'error');
+    };
+
     request.onsuccess = (event) => {
+        console.log('Database opened successfully'); // Debug log
         const db = event.target.result;
         const transaction = db.transaction(['books'], 'readonly');
         const store = transaction.objectStore('books');
@@ -576,7 +613,13 @@ function loadLibrary() {
 
         request.onsuccess = () => {
             const books = request.result;
+            console.log('Retrieved books:', books.length); // Debug log
             displayBooks(books);
+        };
+
+        request.onerror = (event) => {
+            console.error('Error loading books:', event.target.error);
+            showToast('Error loading books', 'error');
         };
     };
 }
@@ -845,3 +888,4 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+

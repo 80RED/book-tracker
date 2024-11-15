@@ -66,6 +66,13 @@ request.onsuccess = (event) => {
 // Modal HTML Injection
 
 function injectBookModal() {
+    console.log('Injecting book modal');
+    // First remove any existing modal
+    const existingModal = document.getElementById('bookModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
     const modalHTML = `
         <div class="modal-overlay" id="bookModal">
             <div class="book-modal">
@@ -103,7 +110,7 @@ function injectBookModal() {
                 </div>
                 
                 <div class="book-modal-actions">
-                    <select class="status-select" id="bookStatus">
+                    <select class="status-select" id="addBookStatus">
                         <option value="to-read">To Read</option>
                         <option value="in-progress">In Progress</option>
                         <option value="completed">Completed</option>
@@ -158,7 +165,7 @@ function showBookModal(book) {
     
     modal.querySelector('.book-description').textContent = book.volumeInfo.description || 'No description available.';
     
-    modal.querySelector('#bookStatus').value = 'to-read';
+    modal.querySelector('#addBookStatus').value = 'to-read';
     
     modal.classList.add('active');
     console.log('Modal should be visible now, active class added'); 
@@ -173,7 +180,7 @@ function closeBookModal() {
 async function addBookToLibrary() {
     if (!selectedBook) return;
     
-    const status = document.getElementById('bookStatus').value;
+    const status = document.getElementById('addBookStatus').value;
     const bookData = {
         title: selectedBook.volumeInfo.title,
         authors: selectedBook.volumeInfo.authors || ['Unknown Author'],
@@ -570,8 +577,8 @@ function injectLibraryComponents() {
                                 <p id="modal-categories"></p>
                                 <p id="modal-pages"></p>
                                 <div class="status-control">
-                                    <label for="modal-status">Status:</label>
-                                    <select id="modal-status">
+                                    <label for="editBookStatus">Status:</label>
+                                    <select id="editBookStatus">
                                         <option value="to-read">To Read</option>
                                         <option value="in-progress">In Progress</option>
                                         <option value="completed">Completed</option>
@@ -730,7 +737,7 @@ function openLibraryModal(book) {
         `<img src="${book.imageLinks.thumbnail}" alt="Cover of ${book.title}"/>` : 
         '<div class="no-cover">No Cover</div>';
     
-    document.getElementById('modal-status').value = book.status;
+    document.getElementById('editBookStatus').value = book.status;
     
     const deleteBtn = modal.querySelector('.modal-btn.delete');
     deleteBtn.onclick = () => deleteBook(book.isbn13);
@@ -771,7 +778,7 @@ function closeLibraryModal() {
 function updateBookStatus() {
     if (!currentLibraryBook) return;
     
-    const newStatus = document.getElementById('modal-status').value;
+    const newStatus = document.getElementById('editBookStatus').value;
     const request = indexedDB.open("db", 7);
     
     request.onsuccess = (event) => {

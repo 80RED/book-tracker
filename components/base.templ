@@ -13,6 +13,8 @@ templ Base(children templ.Component) {
 
 			<script defer src="/assets/js/db.js"></script>
 			<script defer src="/assets/js/htmx.min.js"></script>
+            <script defer src="/assets/js/import-exports.js"></script>
+
 
 		</head>
 		<body>
@@ -20,8 +22,8 @@ templ Base(children templ.Component) {
 				<a href="/">80Reads</a>
 				<div class="navLinks">
 					<a href="/books">Books</a>
-					<a href="/">Import</a>
-					<a href="/">Export</a>
+					<button onclick="handleImportClick()">Import</button>
+					<button onclick="exportLibrary()">Export</button>
 					<a href="/settings">API Key</a>
 				</div>
 			</nav>

@@ -985,3 +985,23 @@ button {
         gap: 1rem;
     }
 }
+
+nav button {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: inherit;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+nav button:hover {
+    color: #007bff;
+}
+
+.navLinks {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+}

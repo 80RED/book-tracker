@@ -1,8 +1,9 @@
 // Creating / opening Indexeddb
 
 let db;
+let currentLibraryBook = null;
 
-const request = window.indexedDB.open("db", 5);
+const request = window.indexedDB.open("db", 7);
 
 request.onerror = (event) => {
     console.error("Error opening IndexedDB:", event.target.error);
@@ -33,6 +34,13 @@ let selectedBook = null;
 request.onsuccess = (event) => {
     db = event.target.result;
     loadSavedApiKey();
+
+    if (window.location.pathname === "/books" || window.location.pathname === "/") {
+        const libraryContainer = document.querySelector('.library-container');
+        if (libraryContainer) {
+            loadLibrary();
+        }
+    }
 };
 
 // Modal HTML Injection
@@ -215,7 +223,11 @@ async function addBookToLibrary() {
         
         addRequest.onsuccess = () => {
             closeBookModal();
+            const searchResults = document.getElementById('search-results');
+            searchResults.classList.remove('active');
+            document.body.classList.remove('search-active');
             showToast('Book added to your library!', 'success');
+            loadLibrary();
         };
         
         addRequest.onerror = (event) => {
@@ -234,6 +246,31 @@ async function addBookToLibrary() {
             console.error('Transaction error:', transaction.error);
         };
     }
+}
+
+function updateBookStatus(newStatus) {
+    if (!currentLibraryBook) return;
+    
+    const request = indexedDB.open("db", 7);
+    
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['books'], 'readwrite');
+        const store = transaction.objectStore('books');
+        
+        const getRequest = store.index('isbn13').get(currentLibraryBook.isbn13);
+        
+        getRequest.onsuccess = () => {
+            const book = getRequest.result;
+            if (book) {
+                book.status = newStatus;
+                store.put(book);
+                showToast('Book status updated successfully', 'success');
+                closeLibraryModal();
+                loadLibrary(); // Refresh display
+            }
+        };
+    };
 }
 
 // API Key Management 
@@ -474,9 +511,254 @@ async function getApiKey() {
     })
 }
 
+function injectLibraryComponents() {
+    const libraryContainer = document.querySelector('.library-container');
+    
+    if (libraryContainer && !libraryContainer.querySelector('.library-search')) {
+        const searchInput = document.createElement('input');
+        searchInput.className = 'library-search';
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Search by title, author, category or status...';
+        searchInput.oninput = (e) => filterLibrary(e.target.value);
+
+        // Insert the search input at the very beginning of .library-container
+        libraryContainer.insertAdjacentElement('afterbegin', searchInput);
+    }
+
+    const modalHTML = `
+        <div class="library-modal" id="libraryModal">
+            <div class="library-modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title"></h2>
+                    <button class="close-modal" onclick="closeLibraryModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="book-details">
+                        <div class="book-cover" id="modal-cover"></div>
+                        <div class="book-info">
+                            <p id="modal-authors"></p>
+                            <p id="modal-categories"></p>
+                            <p id="modal-pages"></p>
+                            <div class="status-control">
+                                <label for="modal-status">Status:</label>
+                                <select id="modal-status">
+                                    <option value="to-read">To Read</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="book-description" id="modal-description"></div>
+                    <div class="modal-actions">
+                        <button class="modal-btn delete">Delete Book</button>    
+                        <button class="modal-btn update" onclick="updateBookStatus()">Update</button>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    
+    if (!document.getElementById('libraryModal')) {
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    loadLibrary();
+}
+
+function loadLibrary() {
+    const request = indexedDB.open("db", 7);
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['books'], 'readonly');
+        const store = transaction.objectStore('books');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            const books = request.result;
+            displayBooks(books);
+        };
+    };
+}
+
+function displayBooks(books) {
+    const container = document.querySelector('.library-container');
+    if (!container) {
+        console.error('Library container not found');
+        return;
+    }
+
+    // Retain the search bar if it exists
+    const existingSearch = container.querySelector('.library-search');
+    
+    // Clear only the book cards area, not the search bar
+    container.innerHTML = '';
+    
+    // Re-add the search bar if it was removed
+    if (existingSearch) {
+        container.appendChild(existingSearch);
+    }
+
+    const bookCardsContainer = document.createElement('div');
+    bookCardsContainer.className = 'book-cards';
+    container.appendChild(bookCardsContainer);
+
+    if (!books || books.length === 0) {
+        const message = document.createElement('p');
+        message.textContent = 'No books in your library yet. Search above to add books!';
+        message.className = 'no-books-message';
+        bookCardsContainer.appendChild(message);
+        return;
+    }
+
+    books.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'library-card';
+        card.innerHTML = `
+            <div class="card-cover">
+                ${book.imageLinks?.thumbnail ? 
+                    `<img src="${book.imageLinks.thumbnail}" alt="Cover of ${book.title}"/>` : 
+                    '<div class="no-cover">No Cover</div>'
+                }
+            </div>
+            <div class="card-info">
+                <h3 class="card-title">${book.title}</h3>
+                <p class="card-authors">${book.authors.join(', ')}</p>
+                <span class="card-status ${book.status}">${formatStatus(book.status)}</span>
+            </div>
+        `;
+        
+        card.addEventListener('click', () => openLibraryModal(book));
+        bookCardsContainer.appendChild(card);
+    });
+}
+
+function formatStatus(status) {
+    return status.split('-').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+}
+
+function filterLibrary(searchTerm) {
+    const request = indexedDB.open("db", 7);
+    
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['books'], 'readonly');
+        const store = transaction.objectStore('books');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            const searchInput = document.querySelector('.library-search');
+            const currentFocus = document.activeElement === searchInput;
+            
+            const books = request.result;
+            const filtered = books.filter(book => {
+                const search = searchTerm.toLowerCase();
+                return (
+                    book.title.toLowerCase().includes(search) ||
+                    book.authors.some(author => author.toLowerCase().includes(search)) ||
+                    book.categories.some(category => category.toLowerCase().includes(search)) ||
+                    book.status.toLowerCase().includes(search)
+                );
+            });
+            
+            displayBooks(filtered);
+            
+            if (currentFocus) {
+                document.querySelector('.library-search').focus();
+            }
+        };
+    };
+}
+
+function openLibraryModal(book) {
+    currentLibraryBook = book;
+    const modal = document.getElementById('libraryModal');
+    
+    document.getElementById('modal-title').textContent = book.title;
+    document.getElementById('modal-authors').textContent = `Authors: ${book.authors.join(', ')}`;
+    document.getElementById('modal-categories').textContent = `Categories: ${book.categories.join(', ')}`;
+    document.getElementById('modal-pages').textContent = `Pages: ${book.pageCount}`;
+    document.getElementById('modal-description').textContent = book.description;
+    
+    const coverContainer = document.getElementById('modal-cover');
+    coverContainer.innerHTML = book.imageLinks?.thumbnail ? 
+        `<img src="${book.imageLinks.thumbnail}" alt="Cover of ${book.title}"/>` : 
+        '<div class="no-cover">No Cover</div>';
+    
+    document.getElementById('modal-status').value = book.status;
+    
+    const deleteBtn = modal.querySelector('.modal-btn.delete');
+    deleteBtn.onclick = () => deleteBook(book.isbn13);
+    
+    modal.classList.add('active');
+}
+
+function deleteBook(isbn13) {
+    if (!confirm('Are you sure you want to delete this book?')) return;
+    
+    const request = indexedDB.open("db", 7);
+    
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['books'], 'readwrite');
+        const store = transaction.objectStore('books');
+        
+        const deleteRequest = store.index('isbn13').getKey(isbn13);
+        
+        deleteRequest.onsuccess = () => {
+            const key = deleteRequest.result;
+            if (key) {
+                store.delete(key);
+                showToast('Book deleted successfully', 'success');
+                closeLibraryModal();
+                loadLibrary();
+            }
+        };
+    };
+}
+
+function closeLibraryModal() {
+    const modal = document.getElementById('libraryModal');
+    modal.classList.remove('active');
+    currentLibraryBook = null;
+}
+
+function updateBookStatus() {
+    if (!currentLibraryBook) return;
+    
+    const newStatus = document.getElementById('modal-status').value;
+    const request = indexedDB.open("db", 7);
+    
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['books'], 'readwrite');
+        const store = transaction.objectStore('books');
+        
+        const getRequest = store.index('isbn13').openCursor(currentLibraryBook.isbn13);
+        
+        getRequest.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                const book = cursor.value;
+                book.status = newStatus;
+                const updateRequest = cursor.update(book);
+                
+                updateRequest.onsuccess = () => {
+                    showToast('Book status updated successfully', 'success');
+                    closeLibraryModal();
+                    loadLibrary();
+                };
+            }
+        };
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     injectBookModal();
     injectToastContainer();
+    injectLibraryComponents();
 
     const cancelBtn = document.querySelector('.modal-btn.cancel');
     if (cancelBtn) {
@@ -521,6 +803,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.value.trim()) {
             searchResults.classList.add('active');
             document.body.classList.add('search-active');
+        }
+    });
+
+    document.getElementById('libraryModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'libraryModal') {
+            closeLibraryModal();
+        }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('libraryModal')?.classList.contains('active')) {
+            closeLibraryModal();
         }
     });
 });

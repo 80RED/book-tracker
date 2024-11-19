@@ -1,7 +1,8 @@
 # book-tracker
 Final project for CS50 - track your reading list.
 
-Forewarning: Since I don't know JavaScript, I used AI for about 99% of it, and it's probably terribly written. As I get better at coding in the future, I plan to rewrite it myself and fix everything. For now, I just wanted to get something working.
+Forewarning: Since I don't know JavaScript and got lazy with CSS, I used AI for about 99% of it, and it's probably terribly written. As I get better at coding in the future, I plan to rewrite it myself and fix everything. For now, I just wanted to get something working.
+
 ## What does this site do?
 You can search for books using the Google Books API and add them to your reading list with a status (either To-read, In-progress, or Completed). You can then view your books, filter through them, and update their reading status as you read through them.
 

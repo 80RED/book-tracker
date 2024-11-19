@@ -130,6 +130,54 @@ function injectBookModal() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
+function setupModalHandlers() {
+    // Library modal handlers
+    document.getElementById('libraryModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'libraryModal') {
+            closeLibraryModal();
+        }
+    });
+
+    // Global click handler for search and book modal
+    document.addEventListener('click', function(event) {
+        const searchBar = document.querySelector('.apiSearchBar');
+        const searchResults = document.getElementById('search-results');
+        const modal = document.getElementById('bookModal');
+        const modalContent = modal?.querySelector('.book-modal');
+        
+        const clickedWithinSearch = searchBar?.contains(event.target) || 
+                                  searchResults?.contains(event.target);
+        const clickedWithinModal = modalContent?.contains(event.target);
+
+        if (modal?.classList.contains('active')) {
+            if (!clickedWithinModal) {
+                closeBookModal();
+            }
+            return; 
+        }
+
+        if (!clickedWithinSearch) {
+            searchResults?.classList.remove('active');
+            document.body.classList.remove('search-active');
+        }
+    });
+
+    // Global escape key handler
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const bookModal = document.getElementById('bookModal');
+            const libraryModal = document.getElementById('libraryModal');
+            
+            if (bookModal?.classList.contains('active')) {
+                closeBookModal();
+            }
+            if (libraryModal?.classList.contains('active')) {
+                closeLibraryModal();
+            }
+        }
+    });
+}
+
 function showBookModal(book) {
     console.log('showBookModal called with book:', book); 
     
@@ -815,15 +863,8 @@ document.addEventListener('htmx:afterSwap', function(evt) {
             injectBookModal();
             injectToastContainer();
             injectLibraryComponents();
-            setupSearchBarFocus(); // Add this line instead of the old event listener
-            
-            // Bind library modal events
-            document.getElementById('libraryModal')?.addEventListener('click', (e) => {
-                if (e.target.id === 'libraryModal') {
-                    closeLibraryModal();
-                }
-            });
-            
+            setupSearchBarFocus();
+            setupModalHandlers();
         } catch (error) {
             console.error('Error initializing library components:', error);
         }
@@ -876,45 +917,6 @@ document.addEventListener('DOMContentLoaded', function() {
         injectToastContainer();
         injectLibraryComponents();
         setupSearchBarFocus();
+        setupModalHandlers();
     }
-
-    // Set up global event handlers
-    document.addEventListener('click', function(event) {
-        const searchBar = document.querySelector('.apiSearchBar');
-        const searchResults = document.getElementById('search-results');
-        const modal = document.getElementById('bookModal');
-        const modalContent = modal?.querySelector('.book-modal');
-        
-        const clickedWithinSearch = searchBar?.contains(event.target) || 
-                                  searchResults?.contains(event.target);
-
-        const clickedWithinModal = modalContent?.contains(event.target);
-
-        if (modal?.classList.contains('active')) {
-            if (!clickedWithinModal) {
-                closeBookModal();
-            }
-            return; 
-        }
-
-        if (!clickedWithinSearch) {
-            searchResults?.classList.remove('active');
-            document.body.classList.remove('search-active');
-        }
-    });
-
-    // Global escape key handler
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const bookModal = document.getElementById('bookModal');
-            const libraryModal = document.getElementById('libraryModal');
-            
-            if (bookModal?.classList.contains('active')) {
-                closeBookModal();
-            }
-            if (libraryModal?.classList.contains('active')) {
-                closeLibraryModal();
-            }
-        }
-    });
 });

@@ -28,7 +28,19 @@ templ Settings() {
 				</form>
 				<div class="api-status"></div>	
 			</div>
-		</div>
 
+			<div class="settings-content api-instructions">
+				<h3>How to Get Your API Key</h3>
+				<div class="instruction-steps">
+					<ol>
+					<li>Create a project on <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer">Google Cloud Console</a></li>
+					<li>Enable the Books API for your project using the <a href="https://console.cloud.google.com/apis/library/books.googleapis.com" target="_blank" rel="noopener noreferrer">Books API page</a></li>
+					<li>Create an API key for your project using the <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud Credentials page</a></li>
+					<li>For security: Edit your key, click "Restrict key" under "API restrictions", and select only the "Books API"</li>
+					<li>Click "Save", then use "Test Key" above to verify your key is working</li>
+					</ol>
+				</div>
+			</div>
+		</div>
 	</div>
 }

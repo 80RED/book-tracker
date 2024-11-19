@@ -56,11 +56,6 @@ func booksHandler(w http.ResponseWriter, r *http.Request) {
 	renderContent(w, r, content)
 }
 
-func aboutHandler(w http.ResponseWriter, r *http.Request) {
-	content := components.About()
-	renderContent(w, r, content)
-}
-
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	content := components.Settings()
 	renderContent(w, r, content)
@@ -75,17 +70,29 @@ func renderContent(w http.ResponseWriter, r *http.Request, content templ.Compone
 }
 
 func main() {
-
 	assetHandler := gzipHandler(func(w http.ResponseWriter, r *http.Request) {
 		assetHandler().ServeHTTP(w, r)
 	})
 
 	http.Handle("/assets/", assetHandler)
 
-	http.HandleFunc("/", gzipHandler(booksHandler))
-	http.HandleFunc("/books", gzipHandler(booksHandler))
-	http.HandleFunc("/about", gzipHandler(aboutHandler))
-	http.HandleFunc("/settings", gzipHandler(settingsHandler))
+	// Root handler that checks the path
+	http.HandleFunc("/", gzipHandler(func(w http.ResponseWriter, r *http.Request) {
+		// Clean the path to handle trailing slashes consistently
+		path := strings.TrimRight(r.URL.Path, "/")
+
+		switch path {
+		case "", "/": // Handle both empty path and root path
+			booksHandler(w, r)
+		case "/books":
+			booksHandler(w, r)
+		case "/settings":
+			settingsHandler(w, r)
+		default:
+			// Instead of redirecting, return 404 for unknown paths
+			http.NotFound(w, r)
+		}
+	}))
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

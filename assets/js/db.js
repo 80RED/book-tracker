@@ -5,26 +5,6 @@ let currentLibraryBook = null;
 
 const request = window.indexedDB.open("db", 7);
 
-document.addEventListener('htmx:afterSwap', function(evt) {
-    console.log('HTMX afterSwap triggered, pathname:', window.location.pathname); // Debug log
-    
-    if (window.location.pathname === "/books" || window.location.pathname === "/") {
-        try {
-            console.log('On books page, initializing components...'); // Debug log
-            injectBookModal();
-            injectToastContainer();
-            injectLibraryComponents();
-        } catch (error) {
-            console.error('Error initializing library components:', error);
-        }
-    }
-});
-
-request.onerror = (event) => {
-    console.error("Error opening IndexedDB:", event.target.error);
-};
-
-
 request.onerror = (event) => {
     console.error("Error opening IndexedDB:", event.target.error);
 };
@@ -51,19 +31,44 @@ request.onupgradeneeded = (event) => {
 
 let selectedBook = null;
 
+function loadSavedApiKey() {
+    const apiKeyInput = document.getElementById('apiKey');
+    if (!apiKeyInput) return;
+
+    const transaction = db.transaction(['settings'], 'readonly');
+    const store = transaction.objectStore('settings');
+    const request = store.get('apiKey');
+
+    request.onsuccess = () => {
+        if (request.result) {
+            document.getElementById('apiKey').value = request.result;
+        }
+    };
+}
+
 request.onsuccess = (event) => {
     db = event.target.result;
-    loadSavedApiKey();
-
-    if (window.location.pathname === "/books" || window.location.pathname === "/") {
+    
+    // Only initialize library if we're on the books page
+    const currentPath = window.location.pathname;
+    if (currentPath === "/books" || currentPath === "/") {
         const libraryContainer = document.querySelector('.library-container');
         if (libraryContainer) {
             loadLibrary();
         }
     }
+    
+    // Always try to load API key as it might be needed for book search
+    loadSavedApiKey();
 };
-
 // Modal HTML Injection
+
+function ensureBookModal() {
+    if (!document.getElementById('bookModal')) {
+        injectBookModal();
+    }
+    return document.getElementById('bookModal');
+}
 
 function injectBookModal() {
     console.log('Injecting book modal');
@@ -133,13 +138,14 @@ function showBookModal(book) {
         return;
     }
     
-    selectedBook = book;
-    const modal = document.getElementById('bookModal');
-    
+    // Ensure modal exists before proceeding
+    const modal = ensureBookModal();
     if (!modal) {
-        console.error('Modal element not found');
+        console.error('Could not create modal');
         return;
     }
+    
+    selectedBook = book;
     
     const modalCover = modal.querySelector('.book-modal-cover');
     modalCover.innerHTML = book.volumeInfo.imageLinks 
@@ -171,11 +177,8 @@ function showBookModal(book) {
     console.log('Modal should be visible now, active class added'); 
 }
 
-function closeBookModal() {
-    const modal = document.getElementById('bookModal');
-    modal.classList.remove('active');
-    selectedBook = null;
-}
+// Update the DOMContentLoaded event listener to ensure modals are initialized
+
 
 async function addBookToLibrary() {
     if (!selectedBook) return;
@@ -302,20 +305,7 @@ function updateBookStatus(newStatus) {
 
 // API Key Management 
 
-function loadSavedApiKey() {
-    const apiKeyInput = document.getElementById('apiKey');
-    if (!apiKeyInput) return;
 
-    const transaction = db.transaction(['settings'], 'readonly');
-    const store = transaction.objectStore('settings');
-    const request = store.get('apiKey');
-
-    request.onsuccess = () => {
-        if (request.result) {
-            document.getElementById('apiKey').value = request.result;
-        }
-    };
-}
 
 function saveApiKey(event) {
     event.preventDefault();
@@ -421,6 +411,24 @@ let searchState = {
     hasMore: true
 };
 
+function setupSearchBarFocus() {
+    const searchBar = document.querySelector('.apiSearchBar');
+    if (!searchBar) return; // Exit if search bar doesn't exist
+    
+    // Remove any existing event listener first
+    const newSearchBar = searchBar.cloneNode(true);
+    searchBar.parentNode.replaceChild(newSearchBar, searchBar);
+    
+    // Add the event listener
+    newSearchBar.addEventListener('focus', function() {
+        const searchResults = document.getElementById('search-results');
+        if (this.value.trim()) {
+            searchResults.classList.add('active');
+            document.body.classList.add('search-active');
+        }
+    });
+}
+
 async function searchBooks(isLoadMore = false) {
     if (searchState.loading || (!isLoadMore && !searchState.hasMore)) return;
     
@@ -519,14 +527,6 @@ function debounceSearch(query) {
     }, 300);
 }
 
-document.querySelector('.apiSearchBar')?.addEventListener('focus', function() {
-    const searchResults = document.getElementById('search-results');
-    if (this.value.trim()) {
-        searchResults.classList.add('active');
-        document.body.classList.add('search-active');
-    }
-});
-
 async function getApiKey() {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(['settings'], 'readonly');
@@ -540,11 +540,11 @@ async function getApiKey() {
 
 // Update the injectLibraryComponents function
 function injectLibraryComponents() {
-    console.log('Injecting library components...'); // Debug log
+    console.log('Injecting library components...'); 
     const libraryContainer = document.querySelector('.library-container');
     
     if (!libraryContainer) {
-        console.error('Library container not found');
+        console.log('Library container not found - not on books page, skipping injection');
         return;
     }
     
@@ -805,68 +805,34 @@ function updateBookStatus() {
     };
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    injectBookModal();
-    injectToastContainer();
-    injectLibraryComponents();
-
-    const cancelBtn = document.querySelector('.modal-btn.cancel');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); 
-            closeBookModal();
-        });
-    }
-
-    document.addEventListener('click', function(event) {
-        const searchBar = document.querySelector('.apiSearchBar');
-        const searchResults = document.getElementById('search-results');
-        const modal = document.getElementById('bookModal');
-        const modalContent = modal?.querySelector('.book-modal');
-        
-        const clickedWithinSearch = searchBar?.contains(event.target) || 
-                                  searchResults?.contains(event.target);
-
-        const clickedWithinModal = modalContent?.contains(event.target);
-
-        if (modal?.classList.contains('active')) {
-            if (!clickedWithinModal) {
-                closeBookModal();
-            }
-            return; 
-        }
-
-        if (!clickedWithinSearch) {
-            searchResults?.classList.remove('active');
-            document.body.classList.remove('search-active');
-        }
-    });
-
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeBookModal();
-        }
-    });
-
-    document.querySelector('.apiSearchBar')?.addEventListener('focus', function() {
-        const searchResults = document.getElementById('search-results');
-        if (this.value.trim()) {
-            searchResults.classList.add('active');
-            document.body.classList.add('search-active');
-        }
-    });
-
-    document.getElementById('libraryModal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'libraryModal') {
-            closeLibraryModal();
-        }
-    });
+document.addEventListener('htmx:afterSwap', function(evt) {
+    const currentPath = window.location.pathname;
+    console.log('HTMX afterSwap triggered, pathname:', currentPath);
     
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.getElementById('libraryModal')?.classList.contains('active')) {
-            closeLibraryModal();
+    if (currentPath === "/books" || currentPath === "/") {
+        try {
+            console.log('On books page, initializing components...');
+            injectBookModal();
+            injectToastContainer();
+            injectLibraryComponents();
+            setupSearchBarFocus(); // Add this line instead of the old event listener
+            
+            // Bind library modal events
+            document.getElementById('libraryModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'libraryModal') {
+                    closeLibraryModal();
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error initializing library components:', error);
         }
-    });
+    }
+    
+    if (currentPath === "/settings") {
+        console.log('On settings page, initializing settings components...');
+        loadSavedApiKey();
+    }
 });
 
 function injectToastContainer() {
@@ -895,4 +861,60 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+function closeBookModal() {
+    const modal = document.getElementById('bookModal');
+    modal.classList.remove('active');
+    selectedBook = null;
+}
 
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    
+    // Initialize components if on books page
+    if (currentPath === "/books" || currentPath === "/") {
+        ensureBookModal();
+        injectToastContainer();
+        injectLibraryComponents();
+        setupSearchBarFocus();
+    }
+
+    // Set up global event handlers
+    document.addEventListener('click', function(event) {
+        const searchBar = document.querySelector('.apiSearchBar');
+        const searchResults = document.getElementById('search-results');
+        const modal = document.getElementById('bookModal');
+        const modalContent = modal?.querySelector('.book-modal');
+        
+        const clickedWithinSearch = searchBar?.contains(event.target) || 
+                                  searchResults?.contains(event.target);
+
+        const clickedWithinModal = modalContent?.contains(event.target);
+
+        if (modal?.classList.contains('active')) {
+            if (!clickedWithinModal) {
+                closeBookModal();
+            }
+            return; 
+        }
+
+        if (!clickedWithinSearch) {
+            searchResults?.classList.remove('active');
+            document.body.classList.remove('search-active');
+        }
+    });
+
+    // Global escape key handler
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const bookModal = document.getElementById('bookModal');
+            const libraryModal = document.getElementById('libraryModal');
+            
+            if (bookModal?.classList.contains('active')) {
+                closeBookModal();
+            }
+            if (libraryModal?.classList.contains('active')) {
+                closeLibraryModal();
+            }
+        }
+    });
+});

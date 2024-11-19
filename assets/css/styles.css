@@ -1018,3 +1018,38 @@ nav button:hover {
     gap: 1.25rem;
     align-items: center;
 }
+
+.api-instructions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.instruction-steps ol {
+    padding-left: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.instruction-steps li {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    line-height: 1.5;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.instruction-steps li:last-child {
+    margin-bottom: 0;
+}
+
+.instruction-steps a {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.instruction-steps a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}

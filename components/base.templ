@@ -19,14 +19,14 @@ templ Base(children templ.Component) {
 		</head>
 		<body>
 			<nav>
-                <a href="/" hx-get="/" hx-target="#content" hx-swap="innerHTML scroll:top">80Reads</a>
-                <div class="navLinks">
-                    <a href="/books" hx-get="/books" hx-target="#content" hx-swap="innerHTML scroll:top">Books</a>
-                    <button onclick="handleImportClick()">Import</button>
-                    <button onclick="exportLibrary()">Export</button>
-                    <a href="/settings" hx-get="/settings" hx-target="#content" hx-swap="innerHTML scroll:top">Settings</a>
-                </div>
-            </nav>
+				<a href="/" hx-get="/" hx-push-url="true" hx-target="#content" hx-swap="innerHTML scroll:top">80Reads</a>
+				<div class="navLinks">
+					<a href="/books" hx-get="/books" hx-push-url="true" hx-target="#content" hx-swap="innerHTML scroll:top">Books</a>
+					<button onclick="handleImportClick()">Import</button>
+					<button onclick="exportLibrary()">Export</button>
+					<a href="/settings" hx-get="/settings" hx-push-url="true" hx-target="#content" hx-swap="innerHTML scroll:top">Settings</a>
+				</div>
+			</nav>
 			<main id="content">
 				@children
 			</main>
